@@ -7,6 +7,8 @@ import i18n from './locales'
 import {initScheme} from './action/index'
 import {isLogin} from './action/index'
 import { router } from "./utils/router";
+import 'element-plus/theme-chalk/dark/css-vars.css'
+
 initScheme()
 
 const app = createApp(App) as any;

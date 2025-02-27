@@ -1,8 +1,14 @@
 import { config } from "../config";
 
-export async function login(code: string, password: string) {
+interface LoginType{
+  code:number,
+  password:string
+}
+
+export async function login({code, password}:LoginType) {
   return postData("/login", { code, password }).then((data) => {
-    localStorage.setItem("token", data.token);
+    if(data)
+      localStorage.setItem("token", data.token);
   });
 }
 
