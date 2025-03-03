@@ -14,3 +14,8 @@ export const router = createRouter({
     history: createWebHistory(),
     routes,
 })
+
+
+export function jumpUrl(path:string){
+    router.push({ path });
+}

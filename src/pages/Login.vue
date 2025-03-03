@@ -6,9 +6,7 @@ import { Avatar } from '@element-plus/icons-vue'
 // import ChangeI18n from './gloabl/ChangeI18n.vue'
 
 defineProps<{ msg: string }>()
-function sendLogin() {
-  login({ code: 2, password: '123' })
-}
+
 
 function sendSubmit() {
   postData("http://127.0.0.1:8088/submit", { code: '42', password: '213' }).then((data) => {
@@ -47,8 +45,33 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
   console.log(tab, event)
 }
 import type { TabsInstance } from 'element-plus'
+import { jumpUrl } from '../utils/router';
+import { isLogin } from '../action';
 const tabPosition = ref('stu')
 const input = ref('')
+const input_code = ref('')
+const input_password = ref('')
+
+
+function handleEdit(e:string) {
+  let value = e.replace(/[^\d]/g, ""); // 只能输入数字
+  value = value.replace(/^0+(\d)/, "$1"); // 第一位0开头，0后面为数字，则过滤掉，取后面的数字
+  value = value.replace(/(\d{15})\d*/, '$1') // 最多保留15位整数
+  input_code.value = value
+}
+
+
+function sendLogin() {
+  let code = parseInt(input_code.value)
+  let password = input_password.value;
+  login({ code: code, password: password })
+  .then((data)=>{
+    if(data){
+      isLogin.value = true
+      jumpUrl('/')
+    }
+  })
+}
 </script>
 
 <template>
@@ -62,12 +85,15 @@ const input = ref('')
         <el-radio-button value="stu">学生</el-radio-button>
         <el-radio-button value="tea">教师</el-radio-button>
       </el-radio-group>
-      <el-input class="input" v-model="input" size="large" placeholder="Please Input" :prefix-icon="Avatar" />
-      <el-input class="input" v-model="input" size="large" placeholder="Please Input" :prefix-icon="Avatar" />
+      <el-input class="input" @input="handleEdit" v-model="input_code" size="large" placeholder="Please Input"
+        :prefix-icon="Avatar" />
+      <el-input class="input" show-password type="password" v-model="input_password" size="large"
+        placeholder="Please Input" :prefix-icon="Avatar" />
       <div class="captcha-wrap">
         <el-input class="captcha" v-model="input" size="large" placeholder="Please Input" :prefix-icon="Avatar" />
         验证码
       </div>
+      <el-button class="login-button" @click="sendLogin" type="primary">登录</el-button>
       <div class="content-bottom">
         还没有账号? 立即注册
       </div>
@@ -91,6 +117,7 @@ const input = ref('')
   background-color: var(--v-block-1);
   box-shadow: var(--el-box-shadow);
   color: var(--el-text-color-primary);
+
   &-wrap {
     padding: 2.375rem 0;
     flex: 1;
@@ -99,14 +126,25 @@ const input = ref('')
     justify-content: space-between;
     align-items: center;
   }
+
   &-top {
     font-size: 30px;
     font-weight: bold;
     color: var(--el-text-color-primary);
   }
+
   .input {
     width: 18.75rem;
+    outline: none;
   }
+
+  .login-button {
+    height: 2.25rem;
+    line-height: 2.25rem;
+    // padding: 1.125rem 0;
+    width: 18.75rem;
+  }
+
   .captcha {
     flex: 1;
     margin-right: 26px;
@@ -122,5 +160,11 @@ const input = ref('')
 
 .read-the-docs {
   color: #888;
+}
+</style>
+<style>
+input:-internal-autofill-selected {
+  -webkit-text-fill-color: #FFFFFF !important;
+  transition: background-color 5000s ease-in-out 0s !important;
 }
 </style>

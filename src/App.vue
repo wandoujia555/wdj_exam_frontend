@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
-import { ref, watch } from 'vue'
-import { color_scheme } from './action';
+import { reactive, ref, watch } from 'vue'
+import { color_scheme, user_code, user_name } from './action';
 import { ElMessage } from 'element-plus'
 
 const activeIndex = ref('1')
@@ -20,23 +20,40 @@ const handleSelect = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }
 
+
+const font = reactive({
+  color: 'rgba(0, 0, 0, .15)',
+})
+
+watch(
+  color_scheme,
+  () => {
+    font.color = color_scheme.value == 'dark'
+      ? 'rgba(0, 0, 0, 0.3)'
+      : 'rgba(0, 0, 0, .15)'
+  },
+  {
+    immediate: true,
+  }
+)
+
 </script>
 
 <template>
   <div class="content-bg">
-    <navigation v-if="!$route.meta.hideNav">
+    <!-- v-if="!$route.meta.hideNav" -->
+    <navigation>
       <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" :ellipsis="false"
         @select="handleSelect">
-        <el-menu-item index="0">
-          <!-- <img style="width: 100px" src="/images/element-plus-logo.svg" alt="Element logo" /> -->
-        </el-menu-item>
-        <el-menu-item index="1">Processing Center</el-menu-item>
-        <el-sub-menu index="2">
+        <div class="logo">logo</div>
+        <el-menu-item index="0" v-if="!$route.meta.hideNav">首页</el-menu-item>
+        <el-menu-item index="1" v-if="!$route.meta.hideNav">历史考试</el-menu-item>
+        <!-- <el-sub-menu index="2" v-if="!$route.meta.hideNav">
           <template #title>Workspace</template>
           <el-menu-item index="2-1">item one</el-menu-item>
           <el-menu-item index="2-2">item two</el-menu-item>
           <el-menu-item index="2-3">item three</el-menu-item>
-        </el-sub-menu>
+        </el-sub-menu> -->
         <el-dropdown @command="handleCommand">
           <span class="el-dropdown-link">
             Dropdown List<el-icon class="el-icon--right"><arrow-down /></el-icon>
@@ -46,8 +63,6 @@ const handleSelect = (key: string, keyPath: string[]) => {
               <el-dropdown-item command="a">Action 1</el-dropdown-item>
               <el-dropdown-item command="b">Action 2</el-dropdown-item>
               <el-dropdown-item command="c">Action 3</el-dropdown-item>
-              <!-- <el-dropdown-item command="d" disabled>Action 4</el-dropdown-item> -->
-              <!-- <el-dropdown-item command="e" divided>Action 5</el-dropdown-item> -->
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -56,11 +71,21 @@ const handleSelect = (key: string, keyPath: string[]) => {
         </div>
       </el-menu>
     </navigation>
-    <RouterView></RouterView>
+    <el-watermark :font="font" class="content-bg-watermark"
+      :content="[user_name, user_code ? user_code : '']">
+      <div class="content">
+        <RouterView></RouterView>
+      </div>
+    </el-watermark>
+    <!--  v-if="!$route.meta.hideNav" -->
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="less">
+.content {
+  width: 100%;
+  display: flex;
+}
 .content-bg {
   display: flex;
   flex-direction: column;
@@ -69,9 +94,13 @@ const handleSelect = (key: string, keyPath: string[]) => {
   background-color: var(--el-color-info-light-8);
   /* background-color: var(--el-bg-color-page); */
   /* background-color: var(--el-bg-color); */
-
   margin: 0;
   min-height: 100vh;
+}
+
+.content-bg-watermark {
+  display: flex;
+  flex: 1;
 }
 
 .el-dropdown-link {
@@ -90,7 +119,10 @@ const handleSelect = (key: string, keyPath: string[]) => {
   padding-right: 1rem;
 }
 
-.el-menu--horizontal>.el-menu-item:nth-child(1) {
+.el-menu--horizontal>.logo {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
   margin-right: auto;
 }
 

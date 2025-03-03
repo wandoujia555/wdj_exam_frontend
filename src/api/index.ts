@@ -1,3 +1,4 @@
+import { user_code, user_name } from "../action";
 import { config } from "../config";
 
 interface LoginType{
@@ -7,8 +8,12 @@ interface LoginType{
 
 export async function login({code, password}:LoginType) {
   return postData("/login", { code, password }).then((data) => {
-    if(data)
+    if(data){
       localStorage.setItem("token", data.token);
+      user_name.value = data.name
+      user_code.value = code
+    }
+    return data
   });
 }
 

@@ -27,10 +27,25 @@ export function initScheme(){
   
 }
 
-export const isLogin = ref(false)
-
+export const isLogin = ref(localStorage.getItem("isLogin")=='true')
+// 验证是否登陆过
 watch(isLogin,(newValue, _)=>{
+  localStorage.setItem("isLogin",String(newValue))
   if(!newValue){
     router.push('/login')
   }
+})
+
+// 用户名
+export const user_name = ref(localStorage.getItem("user_name"))
+watch(user_name,(newValue, _)=>{
+  if(newValue)
+    localStorage.setItem("user_name",newValue)
+})
+
+// 用户号码
+export const user_code = ref<number>(Number(localStorage.getItem("user_code")))
+watch(user_code,(newValue, _)=>{
+  if(newValue)
+    localStorage.setItem("user_code",String(newValue))
 })
