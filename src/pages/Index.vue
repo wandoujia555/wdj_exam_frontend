@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { forma_data, forma_data_day } from '../utils';
+import { jumpUrl } from '../utils/router';
 
 // import { ref } from 'vue'
 // import ChangeI18n from './gloabl/ChangeI18n.vue'
@@ -121,7 +122,9 @@ const exam_time = (start_time: number, end_time: number): string => {
               &#32;{{ `${invi}` }}&#12288;
             </span>
           </div>
-          <el-button class="item-info exam-button">进入考试</el-button>
+          <el-button class="item-info exam-button" @click="()=>{
+            jumpUrl('./exam')
+          }">进入考试</el-button>
         </el-card>
       </div>
       <div class="content-item-title">即将到来的考试</div>

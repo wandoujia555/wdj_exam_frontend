@@ -42,18 +42,12 @@ watch(
 <template>
   <div class="content-bg">
     <!-- v-if="!$route.meta.hideNav" -->
-    <navigation>
+    <navigation v-if="!$route.meta.hideNav">
       <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" :ellipsis="false"
         @select="handleSelect">
         <div class="logo">logo</div>
-        <el-menu-item index="0" v-if="!$route.meta.hideNav">首页</el-menu-item>
-        <el-menu-item index="1" v-if="!$route.meta.hideNav">历史考试</el-menu-item>
-        <!-- <el-sub-menu index="2" v-if="!$route.meta.hideNav">
-          <template #title>Workspace</template>
-          <el-menu-item index="2-1">item one</el-menu-item>
-          <el-menu-item index="2-2">item two</el-menu-item>
-          <el-menu-item index="2-3">item three</el-menu-item>
-        </el-sub-menu> -->
+        <el-menu-item index="0" v-if="!$route.meta.hideInfo">首页</el-menu-item>
+        <el-menu-item index="1" v-if="!$route.meta.hideInfo">历史考试</el-menu-item>
         <el-dropdown @command="handleCommand">
           <span class="el-dropdown-link">
             Dropdown List<el-icon class="el-icon--right"><arrow-down /></el-icon>

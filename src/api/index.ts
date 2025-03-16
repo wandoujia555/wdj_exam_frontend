@@ -17,7 +17,7 @@ export async function login({code, password}:LoginType) {
   });
 }
 
-async function postData(url = "", data = {}) {
+export async function postData(url = "", data = {}) {
   let post_url = config.url + url;
 
   let token = localStorage.getItem("token");

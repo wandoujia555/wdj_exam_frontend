@@ -3,10 +3,21 @@ import routes from "virtual:generated-pages"
 import Index from "../pages/Index.vue";
 // import routes from '~pages'
 routes.push({ path: '/', component: Index })
+const hideNavs = ['/exam']
+const hideInfo = ['/login','/exam']
 routes.forEach(item => {
-    if(item.path == '/login'){
+    if(hideNavs.includes(item.path)){
         item.meta = {
             hideNav: true
+        }
+    }
+    if(hideInfo.includes(item.path)){
+        if(item.meta){
+            item.meta.hideInfo = true
+        }else {
+            item.meta = {
+                hideInfo: true
+            }
         }
     }
 })
