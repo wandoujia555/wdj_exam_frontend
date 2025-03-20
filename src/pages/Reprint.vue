@@ -48,10 +48,11 @@ function convertSecondsToTime(seconds: number) {
   return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${remainingSeconds.padStart(2, '0')}`;
 }
 
-// 考试结束
+// 跳转结果页
 function endExam() {
   jumpUrl('./End')
 }
+
 function startExam() {
   if (data.value) {
     paper.value = data.value
@@ -86,62 +87,21 @@ function startExam() {
   }
 }
 
-
 const exam_time = (start_time: number, end_time: number): string => {
   let [start_day, start_hour] = forma_data(new Date(start_time)).toString().split(' ')
   let [end_day, end_hour] = forma_data(new Date(end_time)).toString().split(' ')
 
   return `${start_day} ${start_hour}  -  ${start_day == end_day ? '' : end_day} ${end_hour}`
 }
+
 </script>
 <template>
   <div class="wrapper">
-    <div class="nav">
-      <div class="nav-left">
-        <div class="nav-title">title</div>
-        <div class="nav-name">考生</div>
-      </div>
-      <!-- <div class="nav-center">
-                <div class="nav-center-procress">你呢</div>
-                <div class="nav-center-percent">已完成 0/35 题</div>
-            </div> -->
-      <div class="nav-right">{{ timeSeconds }}</div>
-    </div>
-    <div v-if="!paper" class="exam-tip">
-
-      <div class="exam-tip-top">
-        <table border class="table">
-          <tr>
-            <th style="width: 200px;padding: 10px;" scope="col">考试名称</th>
-            <th style="width: 300px;padding: 10px;" scope="col">{{ data?.name }}</th>
-          </tr>
-          <tr>
-            <th style="width: 200px;padding: 10px;" scope="col">考试时长（分钟）</th>
-            <th style="width: 300px;padding: 10px;" scope="col">{{ data?.minutes }}</th>
-          </tr>
-          <tr>
-            <th style="width: 200px;padding: 10px;" scope="col">考试时间</th>
-            <th style="width: 300px;padding: 10px;" scope="col">{{
-              data ? exam_time(data.start_time * 1000, (data.start_time + data.minutes * 60) * 1000) : ''
-            }}</th>
-          </tr>
-        </table>
-      </div>
-      <div class="exam-tip-center">
-        <ul>
-          考试说明：
-          <li>1、离开或退出考试界面答题计时不停止，请不要中途离开考试界面。</li>
-          <li>2、保持座位前的桌面干净，不要有与考试无关的内容。</li>
-          <li>3、考试时间截止或答题时间结束，如果处于答题页面，将自动提交试卷。</li>
-          <li>4、考试过程中如果出现页面卡死、题目空白情况，请尝试切换网络或退出重新进入考试。</li>
-        </ul>
-      </div>
-      <button class="startButton" @click="startExam">点击开始考试</button>
-    </div>
-    <div v-else="paper" class="exam-wrap">
+    <!-- 考试预览 -->
+    <div class="exam-wrap">
 
       <!-- <Editor :api-key="apiKey" :init="editorOptions" v-model="content" /> -->
-      <div class="content" v-for="questionList in paper.content">
+      <div class="content" v-for="questionList in paper?.content">
         <div class="title">{{ questionList.name }}</div>
         <Question v-for="(question, index) in questionList.content" :index="index + 1" :question="question">
         </Question>

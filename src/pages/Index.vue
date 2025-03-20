@@ -2,6 +2,8 @@
 import { computed, ref } from 'vue';
 import { forma_data, forma_data_day } from '../utils';
 import { jumpUrl } from '../utils/router';
+import { getPaperList, type PaperInfo } from '../api/paper';
+import { user_code } from '../action';
 
 // import { ref } from 'vue'
 // import ChangeI18n from './gloabl/ChangeI18n.vue'
@@ -41,45 +43,18 @@ const announceds: Announced[] = [
 ]
 
 // 获取当前考试
-interface Exam {
-  type?:number,//1代表即将进行,2代表已完成,3代表
-  title: string,
-  start_time: number,
-  end_time: number,
-  location: string,
-  invigilator: string[],
-}
+// interface Exam {
+//   status?:number,//1代表即将进行,2代表已完成,3代表
+//   name: string,
+//   start_time: number,
+//   end_time: number,
+//   created_time:number,
+//   desc: string,
+//   invigilator: string[],
+// }
 
-const exams = ref<Exam[]>([
-  {
-    title: '考试一',
-    start_time: 1740972869584,
-    end_time: 1740972869584,
-    location: '地点',
-    invigilator: ['一', '二'],
-  },
-  {
-    title: '考试一',
-    start_time: 1741972869584,
-    end_time: 1741972869584,
-    location: '地点',
-    invigilator: ['一', '二'],
-  },
-  {
-    title: '考试一',
-    start_time: 1741972869584,
-    end_time: 1741972869584,
-    location: '地点',
-    invigilator: ['一', '二'],
-  },
-  {
-    title: '考试一',
-    start_time: 1741972869584,
-    end_time: 1741972869584,
-    location: '地点',
-    invigilator: ['一', '二'],
-  }
-])
+const exams = ref<PaperInfo[]>([])
+
 const exams_future = computed(() => {
   return exams.value.filter(value => value.start_time > date_now.getTime())
 })
@@ -88,9 +63,12 @@ const exam_time = (start_time: number, end_time: number): string => {
   let [start_day, start_hour] = forma_data(new Date(start_time)).toString().split(' ')
   let [end_day, end_hour] = forma_data(new Date(end_time)).toString().split(' ')
 
-  return `${start_day} ${start_hour}-${start_day == end_day ? '' : end_day}${end_hour}`
+  return `${start_day} ${start_hour}  -  ${start_day == end_day ? '' : end_day} ${end_hour}`
 }
-
+getPaperList(2).then((data) => {
+  exams.value = data
+  console.log('data', data)
+})
 
 // const count = ref(0)
 </script>
@@ -108,22 +86,22 @@ const exam_time = (start_time: number, end_time: number): string => {
             </div>
           </template>
           <div class="exams-item-title item-info">
-            {{ o.title }}
+            {{ o.name }}
           </div>
           <div class="exams-item-time item-info small-info">
-            时间: {{ exam_time(o.start_time, o.end_time) }}
+            时间: {{ exam_time(o.start_time * 1000, o.end_time * 1000) }}
           </div>
           <div class="exams-item-location item-info small-info">
-            地点: {{ o.location }}
+            描述: {{ o.desc }}
           </div>
-          <div class="item-info small-info">
+          <!-- <div class="item-info small-info">
             监考老师:
             <span v-for="invi in o.invigilator">
               &#32;{{ `${invi}` }}&#12288;
             </span>
-          </div>
-          <el-button class="item-info exam-button" @click="()=>{
-            jumpUrl('./exam')
+          </div> -->
+          <el-button class="item-info exam-button" @click="() => {
+            jumpUrl('./exam', { id: `${o.id}` })
           }">进入考试</el-button>
         </el-card>
       </div>
@@ -136,7 +114,7 @@ const exam_time = (start_time: number, end_time: number): string => {
             </div>
           </template>
           <div v-if="exams_future.length" v-for="(o, index) in exams_future" :key="index" class="announced-left-item">
-            <div class="announced-left-item-title">{{ o.title }}</div>
+            <div class="announced-left-item-title">{{ o.name }}</div>
             <div class="announced-left-item-time small-info">{{ forma_data(new Date(o.start_time)) }}</div>
           </div>
           <el-empty v-else description=" " />
@@ -238,12 +216,15 @@ const exam_time = (start_time: number, end_time: number): string => {
     &-item {
       box-sizing: border-box;
       width: calc(50% - 1.25rem);
+
       .item-info {
         margin-top: .625rem;
       }
+
       .item-info:first-child {
         margin-top: 0;
       }
+
       &-title {
         font-size: 1.25rem;
         font-weight: bold;
