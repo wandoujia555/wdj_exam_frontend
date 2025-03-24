@@ -1,4 +1,4 @@
-import { ref, watch } from "vue";
+import { reactive, ref, watch } from "vue";
 import { router } from "../utils/router";
 
 let temp_scheme = localStorage.getItem("prefers-color-scheme")
@@ -49,3 +49,39 @@ watch(user_code,(newValue, _)=>{
   if(newValue)
     localStorage.setItem("user_code",String(newValue))
 })
+
+// 用户类型
+export const user_type = ref<number>(Number(localStorage.getItem("user_type")))
+watch(user_type,(newValue, _)=>{
+  localStorage.setItem("user_type",String(newValue))
+})
+
+
+export const EventBus = reactive({
+  message: '' as string,
+  listeners: {} as { [key: string]: Function[] },
+
+  on(event: string, callback: Function) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event].push(callback);
+  },
+
+  off(event: string, callback: Function) {
+    if (this.listeners[event]) {
+      const index = this.listeners[event].indexOf(callback);
+      if (index !== -1) {
+        this.listeners[event].splice(index, 1);
+      }
+    }
+  },
+
+  emit(event: string, data?: any) {
+    if (this.listeners[event]) {
+      this.listeners[event].forEach((callback) => {
+        callback(data);
+      });
+    }
+  },
+});

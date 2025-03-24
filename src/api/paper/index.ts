@@ -29,7 +29,7 @@ export interface Paper {
   created_time: number;
   update_time: number;
   start_time: number;
-  content: Record<string, QuestionList>;
+  content: QuestionList[];
 }
 // 获取试卷
 export async function getPaperById({ id }: { id: number }) {
@@ -51,20 +51,44 @@ interface answerPaper {
   content: string;
   user_id: number;
   paper_id: number;
+  answer_type: 0 | 1;
+  status: number;
+  scores: number;
+}
+interface answerRequest {
+  user_id: number;
+  paper_id: number;
 }
 // 设置答案
-export async function setAnswer({ paper_id, user_id, content }: answerPaper) {
-  return postData("/setAnswer", { paper_id, user_id, content }).then(
-    (data: Paper) => {
-      for (let k in data.content) {
-        data.content[k].content.forEach((item) => {
-          item.content = JSON.parse(item.content as string);
-        });
-      }
-      return data;
+export async function setAnswer(obj: answerPaper) {
+  return postData("/setAnswer", obj).then((data: Paper) => {
+    for (let k in data.content) {
+      data.content[k].content.forEach((item) => {
+        item.content = JSON.parse(item.content as string);
+      });
     }
-  );
+    return data;
+  });
 }
+
+// 获取提交
+export async function getAnswer(obj: answerRequest): Promise<answerPaper> {
+  return postData("/getAnswer", obj).then((data: answerPaper) => {
+    return data;
+  });
+}
+interface QuestionAnswer {
+  answer: number;
+  id: number;
+}
+export async function getQuestionAnswer(obj: {
+  id: number;
+}): Promise<QuestionAnswer> {
+  return postData("/getQuestion", obj).then((data: QuestionAnswer) => {
+    return data;
+  });
+}
+
 export interface PaperInfo {
   id: number;
   name: string;
@@ -87,7 +111,7 @@ export async function getPaperList(id: number): Promise<PaperInfo[]> {
     if (data) {
       return data.content.map((item: PaperInfo) => {
         item.end_time = item.duration * 60 + item.start_time;
-        return item
+        return item;
       });
     } else {
       return [];
@@ -95,4 +119,51 @@ export async function getPaperList(id: number): Promise<PaperInfo[]> {
   });
 }
 
+// 获取提交列表
+export interface AnswerInfo {
+  paper_id: number;
+  user_id: number;
+  name: string;
+  score: number;
+  status: number;
+}
+export async function getAnswerInfoList(id: number): Promise<AnswerInfo[]> {
+  return postData("/getAnswerInfoList", { paper_id: id }).then((data: any) => {
+    if (data?.items) {
+      return data.items
+    } else {
+      return [];
+    }
+  });
+}
+
+export interface PaperUserInfo {
+  paper_id: number;
+  user_id: number;
+}
+export async function getPaperUser(data:PaperUserInfo) {
+  return postData("/getPaperUser", data).then((data: any) => {
+    return data
+  });
+}
+
+export interface SetPaperUserInfo {
+  paper_id: number;
+  user_id: number;
+  /**
+   * 0:交卷 1:考试中 2:没进入 3:未开放
+   */
+  status: number;
+}
+export async function setPaperUser(data:SetPaperUserInfo) {
+  return postData("/setPaperUser", data).then((data: any) => {
+    if (data) {
+      return data
+    } else {
+      throw new Error("信息错误");
+    }
+  });
+}
+
+// 获取
 // setAnswer

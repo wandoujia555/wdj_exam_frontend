@@ -106,9 +106,9 @@ import { ref, watch } from 'vue';
 const content = defineModel()
 // import { ref } from 'vue'
 // import Quill from 'quill'
-// const props = defineProps<{
-
-// }>()
+const props = defineProps<{
+    readonly:boolean
+}>()
 
 // console.log(Quill)
 // var quill = new Quill('#editor', {
@@ -125,7 +125,7 @@ function onContentUpdate(newContent:string) {
 </script>
 <template>
     <div>
-        <QuillEditor @update:content="onContentUpdate" contentType="html" class="my-editor" theme="snow"></QuillEditor>
+        <QuillEditor :readOnly="readonly" @update:content="onContentUpdate" contentType="html" class="my-editor" theme="snow"></QuillEditor>
     </div>
 </template>
 

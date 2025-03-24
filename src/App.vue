@@ -1,62 +1,84 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
-import { reactive, ref, watch } from 'vue'
-import { color_scheme, user_code, user_name } from './action';
-import { ElMessage } from 'element-plus'
+import { RouterView } from "vue-router";
+import { reactive, ref, watch } from "vue";
+import {
+  color_scheme,
+  user_code,
+  user_name,
+  isLogin,
+  user_type,
+} from "./action";
+import { ElMessage } from "element-plus";
+import { jumpUrl } from "./utils/router";
+import { EventBus } from './action';
 
-const activeIndex = ref('1')
+const activeIndex = ref("1");
 
-const scheme = ref(color_scheme.value == 'dark')
+const scheme = ref(color_scheme.value == "dark");
 
 watch(scheme, (newValue, _) => {
-  color_scheme.value = newValue ? 'dark' : 'light'
-})
+  color_scheme.value = newValue ? "dark" : "light";
+});
 
 const handleCommand = (command: string | number | object) => {
-  ElMessage(`click on item ${command}`)
-}
+  if (command == "a") {
+    user_code.value = undefined as any;
+    user_name.value = undefined as any;
+    isLogin.value = undefined as any;
+    user_type.value = undefined as any;
+    jumpUrl("./login").then(() => {
+      ElMessage(`退出登录成功`);
+    });
+  }else if(command == "export"){
+    EventBus.emit('export', { message: 'Hello from Component A!' });
+  }
+};
 
 const handleSelect = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
-}
-
+  console.log(key, keyPath);
+};
 
 const font = reactive({
-  color: 'rgba(0, 0, 0, .15)',
-})
+  color: "rgba(0, 0, 0, .15)",
+});
 
 watch(
   color_scheme,
   () => {
-    font.color = color_scheme.value == 'dark'
-      ? 'rgba(0, 0, 0, 0.3)'
-      : 'rgba(0, 0, 0, .15)'
+    font.color =
+      color_scheme.value == "dark"
+        ? "rgba(0, 0, 0, 0.3)"
+        : "rgba(0, 0, 0, .15)";
   },
   {
     immediate: true,
   }
-)
-
+);
 </script>
 
 <template>
   <div class="content-bg">
     <!-- v-if="!$route.meta.hideNav" -->
     <navigation v-if="!$route.meta.hideNav">
-      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" :ellipsis="false"
-        @select="handleSelect">
+      <el-menu
+        :default-active="activeIndex"
+        class="el-menu-demo"
+        mode="horizontal"
+        :ellipsis="false"
+        @select="handleSelect"
+      >
         <div class="logo">logo</div>
         <el-menu-item index="0" v-if="!$route.meta.hideInfo">首页</el-menu-item>
-        <el-menu-item index="1" v-if="!$route.meta.hideInfo">历史考试</el-menu-item>
+        <!-- <el-menu-item index="1" v-if="!$route.meta.hideInfo">历史考试</el-menu-item>
+         -->
         <el-dropdown @command="handleCommand">
-          <span class="el-dropdown-link">
-            Dropdown List<el-icon class="el-icon--right"><arrow-down /></el-icon>
-          </span>
+          <span class="el-dropdown-link"> 操作 </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="a">Action 1</el-dropdown-item>
-              <el-dropdown-item command="b">Action 2</el-dropdown-item>
-              <el-dropdown-item command="c">Action 3</el-dropdown-item>
+              <el-dropdown-item command="a">退出登录</el-dropdown-item>
+              <el-dropdown-item v-if="$route.meta.export" command="export">导出</el-dropdown-item>
+              <!-- <el-dropdown-item command="b">Action 2</el-dropdown-item>
+              <el-dropdown-item command="c">Action 3</el-dropdown-item> -->
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -65,8 +87,11 @@ watch(
         </div>
       </el-menu>
     </navigation>
-    <el-watermark :font="font" class="content-bg-watermark"
-      :content="[user_name, user_code ? user_code : '']">
+    <el-watermark
+      :font="font"
+      class="content-bg-watermark"
+      :content="[user_name, user_code ? user_code : '']"
+    >
       <div class="content">
         <RouterView></RouterView>
       </div>
@@ -99,7 +124,7 @@ watch(
 
 .el-dropdown-link {
   outline: none;
-  margin-right: 1rem;
+  margin: 0 1rem;
   height: 100%;
   display: flex;
   align-items: center;
@@ -113,7 +138,7 @@ watch(
   padding-right: 1rem;
 }
 
-.el-menu--horizontal>.logo {
+.el-menu--horizontal > .logo {
   display: flex;
   align-items: center;
   margin-left: 1rem;

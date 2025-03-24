@@ -1,19 +1,22 @@
-import { user_code, user_name } from "../action";
+import { user_code, user_name, user_type } from "../action";
 import { config } from "../config";
 
-interface LoginType{
-  code:number,
-  password:string
+interface LoginType {
+  code: number;
+  password: string;
+  login_type: number;
 }
 
-export async function login({code, password}:LoginType) {
-  return postData("/login", { code, password }).then((data) => {
-    if(data){
+export async function login(obj: LoginType) {
+  return postData("/login", obj).then((data) => {
+    if (data) {
       localStorage.setItem("token", data.token);
-      user_name.value = data.name
-      user_code.value = code
+      user_name.value = data.name;
+      user_code.value = obj.code;
+      user_type.value = obj.login_type;
     }
-    return data
+    console.log(data)
+    return data;
   });
 }
 
